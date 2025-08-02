@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Api\UserController;
 use App\Http\Controllers\Auth\AuthController;
+use App\Http\Controllers\RolePermissionSetupController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -24,5 +25,8 @@ Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 Route::post('/users/bulk-store', [UserController::class, 'bulkStore'])->name('users.bulkStore');
 Route::post('/users/update/{id}', [UserController::class, 'update'])->name('users.update');
 Route::post('/users/delete/{id}', [UserController::class, 'delete']);
+
+Route::get('/setup-rbac', [RolePermissionSetupController::class, 'setup']) ->middleware('role:SuperAdmin');;
+
 
 });
