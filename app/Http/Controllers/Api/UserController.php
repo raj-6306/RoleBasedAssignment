@@ -23,8 +23,10 @@ class UserController extends Controller
     public function bulkStore(UserStoreBulkRequest $request)
     {
         if (!auth()->user()->hasAnyRole(['SuperAdmin', 'Admin'])) {
+            //  return "Nooob";
             abort(403, 'Only SuperAdmin or Admin can create users.');
         }
+
         $this->userService->bulkStore($request->input('users'));
 
         return response()->json([
@@ -35,7 +37,7 @@ class UserController extends Controller
     public function update(UpdateUserRequest $request, $id)
     {
 
-         $authUser = auth()->user();
+        $authUser = auth()->user();
         $targetUser = User::findOrFail($id);
 
         // Admins can't update other Admins or SuperAdmins
@@ -49,7 +51,12 @@ class UserController extends Controller
         }
 
         // Authorization based on Spatie permission
-        $this->authorize('user.update');
+        // $this->authorize('user.update');
+        if ($authUser->hasRole('User')) {
+            $this->authorize('user.update_own');
+        } else {
+            $this->authorize('user.update');
+        }
         $updated = $this->userService->update($request, $id);
 
         if ($updated) {
@@ -62,18 +69,31 @@ class UserController extends Controller
     public function delete($id): JsonResponse
     {
 
-         $authUser = auth()->user();
+        $authUser = auth()->user();
         $targetUser = User::findOrFail($id);
 
-        // Admins can't delete other Admins or SuperAdmins
+        // If user is trying to delete someone else (not allowed)
+        if ($authUser->hasRole('User') && $authUser->id !== $targetUser->id) {
+            abort(403, 'Users are only allowed to delete their own account.');
+        }
+
+
+        // Admin cannot delete other Admins or SuperAdmins
         if ($authUser->hasRole('Admin') && $targetUser->hasAnyRole(['Admin', 'SuperAdmin'])) {
             abort(403, 'Admins cannot delete other Admins or SuperAdmins.');
         }
 
-        // Regular users can't delete anyone
-        if ($authUser->hasRole('User')) {
-            abort(403, 'Users are not allowed to delete.');
+
+
+        // Authorization check (Spatie-based permission system)
+        if ($authUser->id === $targetUser->id && $authUser->hasRole('User')) {
+
+            $this->authorize('user.delete_own');
+        } else {
+
+            $this->authorize('user.delete');
         }
+
         $result = $this->userService->destroy($id);
 
         if ($result) {

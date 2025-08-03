@@ -27,6 +27,7 @@ class LoginResource extends JsonResource
             'email' => $this->email,
             'token' => $this->token,
             'token_type' => 'Bearer',
+            'role' => $this->getRoleNames()->first(),
         ];
     }
 }

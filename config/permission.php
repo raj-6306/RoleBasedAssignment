@@ -1,7 +1,10 @@
 <?php
 
 return [
-
+    
+    'defaults' => [
+        'guard' => 'api',
+    ],
     'models' => [
 
         /*

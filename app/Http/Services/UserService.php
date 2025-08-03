@@ -38,6 +38,8 @@ class UserService
             }
             $user->update($data);
 
+            $user->syncRoles(['User']);
+
             return true;
         }catch (Exception $e){
             Log::error($e);

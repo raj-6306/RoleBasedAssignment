@@ -26,7 +26,7 @@ Route::post('/users/bulk-store', [UserController::class, 'bulkStore'])->name('us
 Route::post('/users/update/{id}', [UserController::class, 'update'])->name('users.update');
 Route::post('/users/delete/{id}', [UserController::class, 'delete']);
 
-Route::get('/setup-rbac', [RolePermissionSetupController::class, 'setup']) ->middleware('role:SuperAdmin');;
+Route::get('/setup-rbac', [RolePermissionSetupController::class, 'setup']);
 
 
 });

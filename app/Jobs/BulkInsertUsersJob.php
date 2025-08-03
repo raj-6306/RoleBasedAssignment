@@ -13,7 +13,7 @@ use Illuminate\Support\Facades\Hash;
 class BulkInsertUsersJob implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
-    
+
     protected array $users;
 
     /**
@@ -27,20 +27,34 @@ class BulkInsertUsersJob implements ShouldQueue
     /**
      * Execute the job.
      */
+    // public function handle(): void
+    // {
+    //     $data = [];
+
+    //     foreach ($this->users as $user) {
+    //         $data[] = [
+    //             'name' => $user['name'],
+    //             'email' => $user['email'],
+    //             'password' => Hash::make($user['password']),
+    //             'created_at' => now(),
+    //             'updated_at' => now(),
+    //         ];
+    //     }
+
+    //     User::insert($data);
+    // }
+
     public function handle(): void
-    {
-        $data = [];
+{
+    foreach ($this->users as $userData) {
+        $user = User::create([
+            'name' => $userData['name'],
+            'email' => $userData['email'],
+            'password' => Hash::make($userData['password']),
+        ]);
 
-        foreach ($this->users as $user) {
-            $data[] = [
-                'name' => $user['name'],
-                'email' => $user['email'],
-                'password' => Hash::make($user['password']),
-                'created_at' => now(),
-                'updated_at' => now(),
-            ];
-        }
-
-        User::insert($data);
+        $user->assignRole('User');
     }
+}
+
 }
